@@ -1,20 +1,39 @@
+#######################################################################################
+#######################################################################################
+########### Script started in June 2017 by Heather Kropp                    ###########
+########### Script for processing data files from Decgon sensors.           ###########
+########### This script accounts for issues with timestamps due to incorrect###########
+########### computer times, different time zones on devices, and tracks use ###########
+########### of sensors over time. Currently this script assumes that the    ###########
+########### incoming data from the logger is appended to each file with     ###########
+########### consistent time documentation.                                  ###########
+#######################################################################################
+#######################################################################################
+
+
 #setwd to the folder with compiled files saved as csv
 #make sure there are only the compiled files in this folder
-setwd("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\csv_to_process")
+setwd("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\decagon\\csv_to_process")
 #setwd("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\ls_toprocess")
 #specify an output path
-output.path<-"c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\csv_out"
+output.path<-"c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\decagon\\csv_out"
 #indicate the date format of the data
 dateFormat<-"%m/%d/%Y %H:%M"
+
+#read in data tables with sensor and logger information
+datLI<-read.csv("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\decagon\\sensorInfo\\DataloggerInventory.csv")
+datSI<-read.csv("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\decagon\\sensorInfo\\SensorInventory.csv")
+datST<-read.csv("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\decagon\\sensorInfo\\sensorTable.csv")
+
 
 #load lubridate
 library(lubridate)
 ##get file names
-tofix<-list.files(paste0(getwd()))
+tofix<-paste0(getwd(), "/", datLI$loggerFile, ".csv")
 #read in files
 fixmet<-list()
 for(i in 1:length(tofix)){
-	fixmet[[i]]<-read.csv(tofix[i],skip=2)
+	fixmet[[i]]<-read.csv(tofix[i])
 
 }
 
@@ -24,7 +43,7 @@ for(i in 1:length(tofix)){
 
 fixmetD<-list()
 for(i in 1:length(tofix)){
-	fixmetD[[i]]<-data.frame(DateI=as.Date(fixmet[[i]]$Measurement.Time, dateFormat))
+	fixmetD[[i]]<-data.frame(DateI=as.Date(fixmet[[i]]$Timestamp, dateFormat))
 	fixmetD[[i]]$doyUN<-yday(fixmetD[[i]]$DateI)
 	fixmetD[[i]]$yearUN<-year(fixmetD[[i]]$DateI)
 	
@@ -72,8 +91,18 @@ for(i in 1:length(tofix)){
 	Fixout[[i]]<-data.frame(doy=fixmetD[[i]]$doyF2,year=fixmetD[[i]]$yearF,
 							hour=fixmetD[[i]]$hourF, minute=fixmet[[i]]$minute,
 							fixmet[[i]][,6:dim(fixmet[[i]])[2]])
-	write.table(Fixout[[i]], paste0(output.path,"\\",tofix[i], ".csv"),
-				row.names=FALSE, sep=",")
+	
 }
 
+
+
+########################################################################################
+#### match sensor time frames to data
+
+
+
+
+#### organize sensors output
+
+#### 
 
