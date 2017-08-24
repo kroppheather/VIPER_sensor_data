@@ -9,7 +9,10 @@
 ########### consistent time documentation.                                  ###########
 #######################################################################################
 #######################################################################################
-
+#load lubridate
+library(lubridate)
+#load plyr
+library(plyr)
 
 #setwd to the folder with compiled files saved as csv
 #make sure there are only the compiled files in this folder
@@ -26,8 +29,7 @@ datSI<-read.csv("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\
 datST<-read.csv("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\decagon\\sensorInfo\\sensorTable.csv")
 
 
-#load lubridate
-library(lubridate)
+
 ##get file names
 tofix<-paste0(getwd(), "/", datLI$loggerFile, ".csv")
 #read in files
@@ -98,11 +100,55 @@ for(i in 1:length(tofix)){
 
 ########################################################################################
 #### match sensor time frames to data
+########################################################################################   
+
+
+##################################
+#### organize sensor information
+#### and seperate by consideration
+##################################
+#first check how many sensor positions had no changes
+spTableNA <- unique(data.frame(loggerID=datSI$loggerID,slotN=datSI$slotN,sensorMeas=datSI$sensorMeas,
+							sensorName=datSI$sensorName, timeTS=datSI$timeoutEnd,dayTS=datSI$dayEnd))
+#omit slots that don't have sensors
+spTable <- spTableNA[is.na(spTableNA$sensorMeas)==FALSE,]
+
+#set up two tables for subset
+#subset a table for the first sensor placements at the start of the datalogger
+
+#start by getting a count of different sensors in a slot
+slcount <- aggregate(spTable$slotN, by=list(spTable$slotN,spTable$loggerID), FUN="length")
+colnames(slcount) <- c("slotN", "loggerID", "count")
+#only need to use the first start time in slots with only one sensor
+slcountI <- slcount[slcount$count==1,]
+#join other info
+slcountI <- join(slcountI, spTable, by=c("loggerID","slotN"), type="left")
+
+
+#slots with more than 1 sensor
+slcountM <- slcount[slcount$count>1,]
+
+
+#there are currently no slots with multiple sensors cycled through
+#so only do this join if 
+if(dim(slcountM)>0){
+    #get multiple sensors out
+    slmult<-join(spTable,slcountM, by=c("loggerID","slotN"), type="inner")
+
+}
+
+
+##################################
+#### grab output of loggers
+#### for each sensor
+##################################
+
+#turn the 
 
 
 
 
-#### organize sensors output
 
-#### 
+
+
 
