@@ -109,7 +109,7 @@ for(i in 1:length(tofix)){
 ##################################
 #first check how many sensor positions had no changes
 spTableNA <- unique(data.frame(loggerID=datSI$loggerID,slotN=datSI$slotN,sensorMeas=datSI$sensorMeas,
-							sensorName=datSI$sensorName, timeTS=datSI$timeoutEnd,dayTS=datSI$dayEnd))
+							sensorName=datSI$sensorName, timeTS=datSI$timeoutEnd,dayTS=datSI$dayEnd, yearTS=datSI$yearEnd))
 #omit slots that don't have sensors
 spTable <- spTableNA[is.na(spTableNA$sensorMeas)==FALSE,]
 
@@ -131,7 +131,7 @@ slcountM <- slcount[slcount$count>1,]
 
 #there are currently no slots with multiple sensors cycled through
 #so only do this join if 
-if(dim(slcountM)>0){
+if(dim(slcountM)[1]>0){
     #get multiple sensors out
     slmult<-join(spTable,slcountM, by=c("loggerID","slotN"), type="inner")
 
@@ -143,8 +143,29 @@ if(dim(slcountM)>0){
 #### for each sensor
 ##################################
 
-#turn the 
+#fix loggers where there was never a sensor type switch
+#make a list of the sensors for each logger type
+	
+#pull out all sensor combinations
+sensorTemp <- list()
+for(i in 1: dim(slcountI)[1]){
+	sensorTemp[[i]] <- cbind(Fixout[[slcountI$loggerID[i]]]
+	[Fixout[[slcountI$loggerID[i]]]$doy==slcountI$dayTS[i]
+		&Fixout[[slcountI$loggerID[i]]]$hour==slcountI$dayTS[i]
+		&Fixout[[slcountI$loggerID[i]]]$year==slcountI$dayTS[i]:dim(Fixout[[slcountI$loggerID[i]]])
+		,1:4],
+	Fixout[[slcountI$loggerID[i]]][Fixout[[slcountI$loggerID[i]]]$doy==slcountI$dayTS[i]
+		&Fixout[[slcountI$loggerID[i]]]$hour==slcountI$dayTS[i]
+		&Fixout[[slcountI$loggerID[i]]]$year==slcountI$dayTS[i]:dim(Fixout[[slcountI$loggerID[i]]])
+		,4+slcountI$slotN[i]])
+}
+#subset each logger based on the time when it is really starts measurements
 
+
+
+#create an id for what table the sensor output goes into
+tablesI <- unique(data.frame(tableType=datST$tableType))
+tablesI$tableID <- seq(1, dim(tablesI)[1])
 
 
 
