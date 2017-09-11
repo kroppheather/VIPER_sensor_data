@@ -145,31 +145,116 @@ if(dim(slcountM)[1]>0){
 
 #fix loggers where there was never a sensor type switch
 #make a list of the sensors for each logger type
+datST$typeID<- seq(1,dim(datST)[1])
 	
 #pull out all sensor combinations
 sensorTemp <- list()
+
 for(i in 1: dim(slcountI)[1]){
+	#find out the row to subset by
+
 	sensorTemp[[i]] <- cbind(Fixout[[slcountI$loggerID[i]]]
-	[Fixout[[slcountI$loggerID[i]]]$doy==slcountI$dayTS[i]
-		&Fixout[[slcountI$loggerID[i]]]$hour==slcountI$dayTS[i]
-		&Fixout[[slcountI$loggerID[i]]]$year==slcountI$dayTS[i]:dim(Fixout[[slcountI$loggerID[i]]])
-		,1:4],
-	Fixout[[slcountI$loggerID[i]]][Fixout[[slcountI$loggerID[i]]]$doy==slcountI$dayTS[i]
-		&Fixout[[slcountI$loggerID[i]]]$hour==slcountI$dayTS[i]
-		&Fixout[[slcountI$loggerID[i]]]$year==slcountI$dayTS[i]:dim(Fixout[[slcountI$loggerID[i]]])
+	[,1:4],
+	s=Fixout[[slcountI$loggerID[i]]][
 		,4+slcountI$slotN[i]])
+	
 }
-#subset each logger based on the time when it is really starts measurements
-
-
-
+for(i in 1: dim(slcountI)[1]){
+	sensorTemp[[i]]$sensorToinclude<- ifelse(sensorTemp[[i]]$doy<slcountI$dayTS[i]&sensorTemp[[i]]$year==slcountI$yearTS[i],1,
+									ifelse(sensorTemp[[i]]$doy==slcountI$dayTS[i]&sensorTemp[[i]]$year==slcountI$yearTS[i]&sensorTemp[[i]]$hour<slcountI$timeTS[i],1,2))	
+}
+for(i in 1: dim(slcountI)[1]){
+	sensorTemp[[i]]<-sensorTemp[[i]][sensorTemp[[i]]$sensorToinclude==2,]								
+}
 #create an id for what table the sensor output goes into
 tablesI <- unique(data.frame(tableType=datST$tableType))
 tablesI$tableID <- seq(1, dim(tablesI)[1])
 
+#match the sensor table with what data table it goes to
+tableSmatch <- join(datSI, datST, by=c("sensorMeas", "sensorName", "sensorUnit"), type="left")
+
+#createid to keep track with above tbale
+slcountI$sensorID <- seq(1, dim(slcountI)[1])
+
+#now join this to the sesnsor actually usedd
+sensorALL <- join(tableSmatch, slcountI, by=c("slotN", "loggerID", "sensorMeas", "sensorName"), type="right")
+datLname <- data.frame(loggerID=datLI$loggerID, degagonName=datLI$decagonName)
+sensorALL <- join( sensorALL, datLname, by="loggerID", type="left")
 
 
 
+
+#need to add additional sensor info with each observations
+for(i in 1: dim(sensorALL)[1]){
+	sensorTemp[[sensorALL$sensorID[i]]]$site <- rep(sensorALL$site[i],dim(sensorTemp[[i]])[1])
+	sensorTemp[[sensorALL$sensorID[i]]]$sensorZ <- rep(sensorALL$ensorZ[i],dim(sensorTemp[[i]])[1])
+	sensorTemp[[sensorALL$sensorID[i]]]$sensorMeas <- rep(sensorALL$sensorMeas[i],dim(sensorTemp[[i]])[1])
+	sensorTemp[[sensorALL$sensorID[i]]]$sensorName <- rep(sensorALL$sensorName[i],dim(sensorTemp[[i]])[1])
+	sensorTemp[[sensorALL$sensorID[i]]]$sensorUnit <- rep(sensorALL$sensorUnit[i],dim(sensorTemp[[i]])[1])
+	sensorTemp[[sensorALL$sensorID[i]]]$sensorLoc <- rep(sensorALL$sensorLoc[i],dim(sensorTemp[[i]])[1])
+	sensorTemp[[sensorALL$sensorID[i]]]$loggerName <- rep(sensorALL$degagonName[i],dim(sensorTemp[[i]])[1])
+	sensorTemp[[sensorALL$sensorID[i]]]$slotN <- rep(sensorALL$slotN[i],dim(sensorTemp[[i]])[1])
+	sensorTemp[[sensorALL$sensorID[i]]]$typeID <- rep(sensorALL$typeID[i],dim(sensorTemp[[i]])[1])
+}
+
+#convert to data frame
+sensorTemp2 <- ldply(sensorTemp,data.frame)
+
+#now data from each sensor type
+MeasTemp <- list()
+MeasTemp2 <- list()
+for(i in 1:dim(datST)[1]){
+	MeasTemp[[i]] <- sensorTemp2[sensorTemp2$typeID==datST$typeID[i],]
+	MeasTemp2[[i]] <- data.frame(MeasTemp[[i]][,1:3],s=MeasTemp[[i]][,5], sensInfo=paste0(MeasTemp[[i]]$sensorMeas,".",MeasTemp[[i]]$sensorName),
+									sensorUnit=MeasTemp[[i]]$sensorUnit,sensorLoc=MeasTemp[[i]]$sensorLoc,
+									site=MeasTemp[[i]]$site, loggerName=MeasTemp[[i]]$loggerName, slotN=MeasTemp[[i]]$slotN )
+	
+	colnames(MeasTemp2[[i]])[4] <- paste0(datST$sensorMeas[i],".",datST$sensorName[i])
+		colnames(MeasTemp2[[i]])[5:10] <- paste0(datST$sensorMeas[i],".",datST$sensorName[i],".",colnames(MeasTemp2[[i]])[6:11])							
+									
+	}
+
+	
+#now need to group by which table it goes to
+
+soilIDs <- datST[datST$tableType=="soil",]
+
+soilListTemp<-list()
+for(i in 1:dim(soilIDs)[1]){
+	soilListTemp[[i]] <- MeasTemp2[[soilIDs$typeID[i]]]
+
+}
+#now subset lists by type
+metIDs <- datST[datST$tableType=="met",]
+
+metListTemp<-list()
+for(i in 1:dim(metIDs)[1]){
+	metListTemp[[i]] <- MeasTemp2[[metIDs$typeID[i]]]
+
+}
+
+#now subset lists by type
+waterIDs <- datST[datST$tableType=="water",]
+
+waterListTemp<-list()
+for(i in 1:dim(metIDs)[1]){
+	waterListTemp[[i]] <- MeasTemp2[[waterIDs$typeID[i]]]
+
+}
+
+NDVIIDs <- datST[datST$tableType=="NDVI",]
+
+NDVIListTemp<-list()
+for(i in 1:dim(metIDs)[1]){
+	NDVIListTemp[[i]] <- MeasTemp2[[NDVIIDs$typeID[i]]]
+
+}
+
+
+#now recursively join the items in the list
+NDVIall  <- join_all(NDVIListTemp, by=c("doy", "year","hour"), type="full")
+
+waterall  <- join_all(waterListTemp, by=c("doy", "year","hour"), type="full")
 
 
 
