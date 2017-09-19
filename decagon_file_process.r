@@ -187,7 +187,7 @@ sensorALL <- join( sensorALL, datLname, by="loggerID", type="left")
 #need to add additional sensor info with each observations
 for(i in 1: dim(sensorALL)[1]){
 	sensorTemp[[sensorALL$sensorID[i]]]$site <- rep(sensorALL$site[i],dim(sensorTemp[[i]])[1])
-	sensorTemp[[sensorALL$sensorID[i]]]$sensorZ <- rep(sensorALL$ensorZ[i],dim(sensorTemp[[i]])[1])
+	sensorTemp[[sensorALL$sensorID[i]]]$sensorZ <- rep(sensorALL$sensorZ[i],dim(sensorTemp[[i]])[1])
 	sensorTemp[[sensorALL$sensorID[i]]]$sensorMeas <- rep(sensorALL$sensorMeas[i],dim(sensorTemp[[i]])[1])
 	sensorTemp[[sensorALL$sensorID[i]]]$sensorName <- rep(sensorALL$sensorName[i],dim(sensorTemp[[i]])[1])
 	sensorTemp[[sensorALL$sensorID[i]]]$sensorUnit <- rep(sensorALL$sensorUnit[i],dim(sensorTemp[[i]])[1])
@@ -205,12 +205,12 @@ MeasTemp <- list()
 MeasTemp2 <- list()
 for(i in 1:dim(datST)[1]){
 	MeasTemp[[i]] <- sensorTemp2[sensorTemp2$typeID==datST$typeID[i],]
-	MeasTemp2[[i]] <- data.frame(MeasTemp[[i]][,1:3],s=MeasTemp[[i]][,5], sensInfo=paste0(MeasTemp[[i]]$sensorMeas,".",MeasTemp[[i]]$sensorName),
+	MeasTemp2[[i]] <- data.frame(MeasTemp[[i]][,1:3],s=MeasTemp[[i]][,5], sensorZ=MeasTemp[[i]]$sensorZ, sensInfo=paste0(MeasTemp[[i]]$sensorMeas,".",MeasTemp[[i]]$sensorName),
 									sensorUnit=MeasTemp[[i]]$sensorUnit,sensorLoc=MeasTemp[[i]]$sensorLoc,
 									site=MeasTemp[[i]]$site, loggerName=MeasTemp[[i]]$loggerName, slotN=MeasTemp[[i]]$slotN )
 	
 	colnames(MeasTemp2[[i]])[4] <- paste0(datST$sensorMeas[i],".",datST$sensorName[i])
-		colnames(MeasTemp2[[i]])[5:10] <- paste0(datST$sensorMeas[i],".",datST$sensorName[i],".",colnames(MeasTemp2[[i]])[6:11])							
+		#colnames(MeasTemp2[[i]])[5:11] <- paste0(datST$sensorMeas[i],".",datST$sensorName[i],".",colnames(MeasTemp2[[i]])[5:11])							
 									
 	}
 
@@ -252,18 +252,27 @@ for(i in 1:dim(NDVIIDs)[1]){
 
 }
 
-#install.packages(c("data.table"))
-#library(data.table)
-#now recursively join the items in the list
-NDVIall<-NDVIListTemp[[1]]
-for(j in 2:dim(NDVIIDs)[1]){
-	NDVIall  <- data.table(NDVIall,NDVIListTemp[[i]], by=c("doy", "year","hour"))
+#now write each sensor to its folder
+for(i in 1:dim(NDVIIDs)[1]){
+	write.table(NDVIListTemp[[i]], 
+		paste0("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\decagon\\csv_out\\ndvi\\",colnames(NDVIListTemp[[i]])[4],
+				".csv"), sep=",", row.names=FALSE)
 }
 
+for(i in 1:dim(soilIDs)[1]){
+	write.table(soilListTemp[[i]], 
+		paste0("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\decagon\\csv_out\\soil\\",colnames(soilListTemp[[i]])[4],
+				".csv"), sep=",", row.names=FALSE)
+}
 
+for(i in 1:dim(metIDs)[1]){
+	write.table(metListTemp[[i]], 
+		paste0("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\decagon\\csv_out\\met\\",colnames(metListTemp[[i]])[4],
+				".csv"), sep=",", row.names=FALSE)
+}
 
-
-waterall  <- join_all(waterListTemp, by=c("doy", "year","hour"), type="full")
-
-
-
+for(i in 1:dim(waterIDs)[1]){
+	write.table(waterListTemp[[i]], 
+		paste0("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\decagon\\csv_out\\water\\",colnames(waterListTemp[[i]])[4],
+				".csv"), sep=",", row.names=FALSE)
+}
