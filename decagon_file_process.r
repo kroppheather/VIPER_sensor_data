@@ -237,22 +237,31 @@ for(i in 1:dim(metIDs)[1]){
 waterIDs <- datST[datST$tableType=="water",]
 
 waterListTemp<-list()
-for(i in 1:dim(metIDs)[1]){
+for(i in 1:dim(waterIDs)[1]){
 	waterListTemp[[i]] <- MeasTemp2[[waterIDs$typeID[i]]]
 
 }
 
+
+
 NDVIIDs <- datST[datST$tableType=="NDVI",]
 
 NDVIListTemp<-list()
-for(i in 1:dim(metIDs)[1]){
+for(i in 1:dim(NDVIIDs)[1]){
 	NDVIListTemp[[i]] <- MeasTemp2[[NDVIIDs$typeID[i]]]
 
 }
 
-
+#install.packages(c("data.table"))
+#library(data.table)
 #now recursively join the items in the list
-NDVIall  <- join_all(NDVIListTemp, by=c("doy", "year","hour"), type="full")
+NDVIall<-NDVIListTemp[[1]]
+for(j in 2:dim(NDVIIDs)[1]){
+	NDVIall  <- data.table(NDVIall,NDVIListTemp[[i]], by=c("doy", "year","hour"))
+}
+
+
+
 
 waterall  <- join_all(waterListTemp, by=c("doy", "year","hour"), type="full")
 
