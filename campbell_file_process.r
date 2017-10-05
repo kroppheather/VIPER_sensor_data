@@ -27,7 +27,7 @@ dateFormat<-"%m/%d/%Y %H:%M"
 #read in data tables with sensor and logger information
 datMI<-read.csv("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\campbell\\sensor_info\\measurement_info.csv")
 datDI<-read.csv("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\campbell\\sensor_info\\datatable_desc.csv")
-
+datSI <- read.csv("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\campbell\\sensor_info\\sensor_info.csv")
 #get unique filenames
 datLI <- data.frame(loggerFile = unique(as.character(datDI$filename)))
 datLI$loggID <- seq(1, dim(datLI)[1])
@@ -38,7 +38,7 @@ tofix<-paste0(getwd(), "/", datLI$loggerFile, ".csv")
 #read in files
 fixmet<-list()
 for(i in 1:length(tofix)){
-	fixmet[[i]]<-read.csv(tofix[i])
+	fixmet[[i]]<-read.csv(tofix[i], na.strings=c("NAN", "NA"))
 
 }
 
@@ -147,11 +147,77 @@ for(i in 1:length(tofix)){
 }
 
 
-#now need to pull out all relevant info
+#now need to pull out all by measurement type
+#join measurement type
+colnames(datSI)[1] <- "loggerFile" 
+fileStart <- join(fileStart, datSI, by="loggerFile", type="left" )
+
+
+
+
+ 
+#pull out each type into a list
+sapflowF <- fileStart[fileStart$measType=="sapflow",]
+heatfluxF <- fileStart[fileStart$measType=="heatflux",]
+radiationF <- fileStart[fileStart$measType=="radiation",]
 
 #for sapflux variables are best left relatively untouched 
-#with the exception of removing empty logged slots in flow 32  
+#so just pull out and leave untouched
+
+sapflowListTemp<-list()
+for(i in 1:dim(sapflowF )[1]){
+	sapflowListTemp[[i]] <- Fixout2[[sapflowF$loggID[i]]]
+	#clean up column names
+	colnames(sapflowListTemp[[i]]) <- gsub("[[:punct:]]", "", colnames(sapflowListTemp[[i]]))
+	
+	write.table(sapflowListTemp[[i]],
+		paste0("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\campbell\\csv_out\\sapflow\\",sapflowF$loggerFile[i], ".csv" ),
+		sep=",", row.names=FALSE)
+}
 
 
+#now compile radiation
+
+#just grab the info for the entire radiometer
+datDIsub <- data.frame(loggerFile= datDI$filename, site= datDI$site, sensorZ= datDI$sensorZ, loc=datDI$sensorLoc)
+radiationF <- join(radiationF, datDIsub, by="loggerFile", type="left")
+
+radiationListTemp<-list()
+for(i in 1:dim(radiationF )[1]){
+	radiationListTemp[[i]] <- Fixout2[[radiationF$loggID[i]]]
+	#add the site info, location, and height 
+	radiationListTemp[[i]]$site <- rep(radiationF$site[i], dim(radiationListTemp[[i]])[1])
+	radiationListTemp[[i]]$loc <- rep(radiationF$loc[i], dim(radiationListTemp[[i]])[1])
+	radiationListTemp[[i]]$sensorZ <- rep(radiationF$sensorZ[i], dim(radiationListTemp[[i]])[1])
+}
+#now add all together
+radiationAll <- ldply(radiationListTemp, data.frame)
+
+write.table(radiationAll, "c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\campbell\\csv_out\\radiation\\netR.csv",
+			sep=",", row.names=FALSE)
+			
+			
+# compile heatflux
+#first grab relevant heatflux data
+heatfluxListTemp<-list()
+heatMeas <- list()
+heatfluxListTemp2<-list()
+for(i in 1:dim(heatfluxF )[1]){
+	heatfluxListTemp[[i]] <- Fixout2[[heatfluxF$loggID[i]]]
+	heatMeas[[i]] <- measList2[[heatfluxF$loggID[i]]]
+	#restructure to combine all into a dataframe
+	heatfluxListTemp2[[i]] <- data.frame(doy=rep(heatfluxListTemp[[i]][,1], times=dim(heatMeas[[i]])[1]),
+										year=rep(heatfluxListTemp[[i]][,2], times=dim(heatMeas[[i]])[1]),
+										hour=rep(heatfluxListTemp[[i]][,3], times=dim(heatMeas[[i]])[1]),
+										shf=as.vector(data.matrix(heatfluxListTemp[[i]][,6:(5+dim(heatMeas[[i]])[1])])),
+										site=rep(heatMeas[[i]]$site, each=dim(heatfluxListTemp[[i]])[1]),
+										loc=rep(heatMeas[[i]]$sensorLoc, each=dim(heatfluxListTemp[[i]])[1]),
+										sensorZ=rep(heatMeas[[i]]$sensorZ, each=dim(heatfluxListTemp[[i]])[1]),
+										sensorID=rep(heatMeas[[i]]$sensorID, each=dim(heatfluxListTemp[[i]])[1]))
+										}
+#combine all together
+heatfluxAll <- ldply(heatfluxListTemp2, data.frame)
 
 
+write.table(heatfluxAll,"c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\campbell\\csv_out\\heatflux\\heatflux.csv",
+			sep=",", row.names=FALSE)			
