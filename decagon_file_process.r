@@ -252,6 +252,20 @@ for(i in 1:dim(NDVIIDs)[1]){
 
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #now write each sensor to its folder
 for(i in 1:dim(NDVIIDs)[1]){
 	write.table(NDVIListTemp[[i]], 
