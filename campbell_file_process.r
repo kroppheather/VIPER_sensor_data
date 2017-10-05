@@ -110,6 +110,32 @@ for(i in 1:length(tofix)){
 #### match sensor info to data
 ########################################################################################   
 
+
+#each datatable has the same initialization period because all of the sensors are set up together
+#for the data table. Just need to subset Fixout based on the datatable
+#just get the unique date for each datatable
+dateStartD <- unique(data.frame(loggerFile=datDI$filename, timeoutEnd = datDI$timeoutEnd, 
+					dayEnd=datDI$dayEnd, yearEnd=datDI$yearEnd))
+					
+#now merge with datatable ID
+fileStart <- join(datLI, dateStartD, by="loggerFile",type="left")					
+
+#exclude any data in the warm up period before sensor install
+Fixout2<- list()
+fixStart <- numeric (0)
+for(i in 1:length(tofix)){
+	#get the starting point for the data
+	if(length(which(Fixout[[i]]$doy==fileStart$dayEnd[i]&
+				Fixout[[i]]$hour==fileStart$timeoutEnd[i]&
+				Fixout[[i]]$year==fileStart$yearEnd[i]))!= 0){
+					fixStart[i] <- which(Fixout[[i]]$doy==fileStart$dayEnd[i]&
+								Fixout[[i]]$hour==fileStart$timeoutEnd[i]&
+								Fixout[[i]]$year==fileStart$yearEnd[i])
+	}else{fixStart[i] <- 1}							
+	#subset to include starting point							
+	Fixout2[[i]] <- Fixout[[i]][fixStart[i]:dim(Fixout[[i]])[1],]
+}
+					
 #start by subsetting the info for each data table
 measList <- list()
 measList2 <- list()
@@ -121,6 +147,10 @@ for(i in 1:length(tofix)){
 }
 
 
+#now need to pull out all relevant info
+
+#for sapflux variables are best left relatively untouched 
+#with the exception of removing empty logged slots in flow 32  
 
 
 
