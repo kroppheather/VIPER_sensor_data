@@ -254,39 +254,35 @@ for(i in 1:dim(NDVIIDs)[1]){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-#now write each sensor to its folder
+#now write each sensor to the output folder
+#save in 3 locations so undergrads can access for their own working folder
+#an original copy gets saved in the viper energy folder
+#I also have my own working folder
+dir1 <-c("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\decagon\\csv_out\\",
+		"c:\\Users\\hkropp\\Google Drive\\Loranty_Lab_Sensor\\decagon\\sensorData\\",
+		"c:\\Users\\hkropp\\Google Drive\\viperSensor\\")
+for(k in 1:length(dir1)){
 for(i in 1:dim(NDVIIDs)[1]){
 	write.table(NDVIListTemp[[i]], 
-		paste0("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\decagon\\csv_out\\ndvi\\",colnames(NDVIListTemp[[i]])[4],
+		paste0(dir1[k],"ndvi\\",colnames(NDVIListTemp[[i]])[4],
 				".csv"), sep=",", row.names=FALSE)
 }
 
 for(i in 1:dim(soilIDs)[1]){
 	write.table(soilListTemp[[i]], 
-		paste0("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\decagon\\csv_out\\soil\\",colnames(soilListTemp[[i]])[4],
+		paste0(dir1[k],"soil\\",colnames(soilListTemp[[i]])[4],
 				".csv"), sep=",", row.names=FALSE)
 }
 
 for(i in 1:dim(metIDs)[1]){
 	write.table(metListTemp[[i]], 
-		paste0("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\decagon\\csv_out\\met\\",colnames(metListTemp[[i]])[4],
+		paste0(dir1[k],"met\\",colnames(metListTemp[[i]])[4],
 				".csv"), sep=",", row.names=FALSE)
 }
 
 for(i in 1:dim(waterIDs)[1]){
 	write.table(waterListTemp[[i]], 
-		paste0("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\decagon\\csv_out\\water\\",colnames(waterListTemp[[i]])[4],
+		paste0(dir1[k],"water\\",colnames(waterListTemp[[i]])[4],
 				".csv"), sep=",", row.names=FALSE)
+}
 }

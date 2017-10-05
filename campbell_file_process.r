@@ -164,18 +164,24 @@ radiationF <- fileStart[fileStart$measType=="radiation",]
 #for sapflux variables are best left relatively untouched 
 #so just pull out and leave untouched
 
+#directories to save to
+dir1 <-c("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\campbell\\csv_out\\",
+		"c:\\Users\\hkropp\\Google Drive\\Loranty_Lab_Sensor\\campbell\\",
+		"c:\\Users\\hkropp\\Google Drive\\viperSensor\\")
+
 sapflowListTemp<-list()
-for(i in 1:dim(sapflowF )[1]){
-	sapflowListTemp[[i]] <- Fixout2[[sapflowF$loggID[i]]]
-	#clean up column names
-	colnames(sapflowListTemp[[i]]) <- gsub("[[:punct:]]", "", colnames(sapflowListTemp[[i]]))
-	
-	write.table(sapflowListTemp[[i]],
-		paste0("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\campbell\\csv_out\\sapflow\\",sapflowF$loggerFile[i], ".csv" ),
-		sep=",", row.names=FALSE)
+for(k in 1:length(dir1)){
+	for(i in 1:dim(sapflowF )[1]){
+		sapflowListTemp[[i]] <- Fixout2[[sapflowF$loggID[i]]]
+		#clean up column names
+		colnames(sapflowListTemp[[i]]) <- gsub("[[:punct:]]", "", colnames(sapflowListTemp[[i]]))
+		
+		write.table(sapflowListTemp[[i]],
+			paste0(dir1[k],"sapflow\\",sapflowF$loggerFile[i], ".csv" ),
+			sep=",", row.names=FALSE)
+	}
+
 }
-
-
 #now compile radiation
 
 #just grab the info for the entire radiometer
@@ -193,8 +199,7 @@ for(i in 1:dim(radiationF )[1]){
 #now add all together
 radiationAll <- ldply(radiationListTemp, data.frame)
 
-write.table(radiationAll, "c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\campbell\\csv_out\\radiation\\netR.csv",
-			sep=",", row.names=FALSE)
+
 			
 			
 # compile heatflux
@@ -218,6 +223,10 @@ for(i in 1:dim(heatfluxF )[1]){
 #combine all together
 heatfluxAll <- ldply(heatfluxListTemp2, data.frame)
 
-
-write.table(heatfluxAll,"c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\campbell\\csv_out\\heatflux\\heatflux.csv",
-			sep=",", row.names=FALSE)			
+#write output
+for(k in 1:length(dir1)){
+write.table(radiationAll, paste0(dir1[k],"\\radiation\\netR.csv"),
+			sep=",", row.names=FALSE)
+write.table(heatfluxAll,paste0(dir1[k],"\\heatflux\\heatflux.csv"),
+			sep=",", row.names=FALSE)		
+}			
