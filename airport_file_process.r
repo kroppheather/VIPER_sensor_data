@@ -56,9 +56,10 @@ metAirport <- join(datPj, PrecipDay, by=c("doy", "year"), type="full")
 #gapfill missing pressure by interpolating with a linear interpolation
 metAirport$Pkpa.gap <- na.interpolation(metAirport$Pkpa, option="linear")
 
-dir1 <-c("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\airport\\csv_out\\",
-		"c:\\Users\\hkropp\\Google Drive\\Loranty_Lab_Sensor\\airport\\",
-		"c:\\Users\\hkropp\\Google Drive\\viperSensor\\airport\\")
+dir1 <-c(#"c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\airport\\csv_out\\",
+		#"c:\\Users\\hkropp\\Google Drive\\Loranty_Lab_Sensor\\airport\\",
+		#"c:\\Users\\hkropp\\Google Drive\\viperSensor\\airport\\",
+		"z:\\student_research\\tobio\\viperSensor\\airport\\")
 for(k in 1:length(dir1)){
 write.table(metAirport, paste0(dir1[k],"airport.csv"),
 			sep=",", row.names=FALSE)

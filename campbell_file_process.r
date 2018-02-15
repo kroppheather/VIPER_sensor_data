@@ -165,9 +165,10 @@ radiationF <- fileStart[fileStart$measType=="radiation",]
 #so just pull out and leave untouched
 
 #directories to save to
-dir1 <-c("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\campbell\\csv_out\\",
-		"c:\\Users\\hkropp\\Google Drive\\Loranty_Lab_Sensor\\campbell\\",
-		"c:\\Users\\hkropp\\Google Drive\\viperSensor\\")
+dir1 <-c(#"c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\campbell\\csv_out\\",
+		#"c:\\Users\\hkropp\\Google Drive\\Loranty_Lab_Sensor\\campbell\\",
+		#"c:\\Users\\hkropp\\Google Drive\\viperSensor\\",
+		"z:\\student_research\\tobio\\viperSensor\\campbell\\")
 
 sapflowListTemp<-list()
 for(k in 1:length(dir1)){

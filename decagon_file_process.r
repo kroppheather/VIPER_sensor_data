@@ -258,9 +258,10 @@ for(i in 1:dim(NDVIIDs)[1]){
 #save in 3 locations so undergrads can access for their own working folder
 #an original copy gets saved in the viper energy folder
 #I also have my own working folder
-dir1 <-c("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\decagon\\csv_out\\",
-		"c:\\Users\\hkropp\\Google Drive\\Loranty_Lab_Sensor\\decagon\\sensorData\\",
-		"c:\\Users\\hkropp\\Google Drive\\viperSensor\\")
+dir1 <-c(#"c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\decagon\\csv_out\\",
+		#"c:\\Users\\hkropp\\Google Drive\\Loranty_Lab_Sensor\\decagon\\sensorData\\",
+		#"c:\\Users\\hkropp\\Google Drive\\viperSensor\\",
+		"z:\\student_research\\tobio\\viperSensor\\decagon\\")
 for(k in 1:length(dir1)){
 for(i in 1:dim(NDVIIDs)[1]){
 	write.table(NDVIListTemp[[i]], 
