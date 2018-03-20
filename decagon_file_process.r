@@ -261,7 +261,8 @@ for(i in 1:dim(NDVIIDs)[1]){
 dir1 <-c(#"c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\decagon\\csv_out\\",
 		#"c:\\Users\\hkropp\\Google Drive\\Loranty_Lab_Sensor\\decagon\\sensorData\\",
 		#"c:\\Users\\hkropp\\Google Drive\\viperSensor\\",
-		"z:\\student_research\\tobio\\viperSensor\\decagon\\")
+		#"z:\\student_research\\tobio\\viperSensor\\decagon\\",
+		"z:\\data_repo\\field_data\\viperSensor\\decagon\\")
 for(k in 1:length(dir1)){
 for(i in 1:dim(NDVIIDs)[1]){
 	write.table(NDVIListTemp[[i]], 
