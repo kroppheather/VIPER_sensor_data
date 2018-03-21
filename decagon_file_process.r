@@ -195,6 +195,7 @@ for(i in 1: dim(sensorALL)[1]){
 	sensorTemp[[sensorALL$sensorID[i]]]$loggerName <- rep(sensorALL$degagonName[i],dim(sensorTemp[[i]])[1])
 	sensorTemp[[sensorALL$sensorID[i]]]$slotN <- rep(sensorALL$slotN[i],dim(sensorTemp[[i]])[1])
 	sensorTemp[[sensorALL$sensorID[i]]]$typeID <- rep(sensorALL$typeID[i],dim(sensorTemp[[i]])[1])
+	sensorTemp[[sensorALL$sensorID[i]]]$sensorUID <- rep(sensorALL$sensorUID[i],dim(sensorTemp[[i]])[1])
 }
 
 #convert to data frame
@@ -207,7 +208,7 @@ for(i in 1:dim(datST)[1]){
 	MeasTemp[[i]] <- sensorTemp2[sensorTemp2$typeID==datST$typeID[i],]
 	MeasTemp2[[i]] <- data.frame(MeasTemp[[i]][,1:3],s=MeasTemp[[i]][,5], sensorZ=MeasTemp[[i]]$sensorZ, sensInfo=paste0(MeasTemp[[i]]$sensorMeas,".",MeasTemp[[i]]$sensorName),
 									sensorUnit=MeasTemp[[i]]$sensorUnit,sensorLoc=MeasTemp[[i]]$sensorLoc,
-									site=MeasTemp[[i]]$site, loggerName=MeasTemp[[i]]$loggerName, slotN=MeasTemp[[i]]$slotN )
+									site=MeasTemp[[i]]$site, loggerName=MeasTemp[[i]]$loggerName, slotN=MeasTemp[[i]]$slotN,sensorUID=MeasTemp[[i]]$sensorUID )
 	
 	colnames(MeasTemp2[[i]])[4] <- paste0(datST$sensorMeas[i],".",datST$sensorName[i])
 		#colnames(MeasTemp2[[i]])[5:11] <- paste0(datST$sensorMeas[i],".",datST$sensorName[i],".",colnames(MeasTemp2[[i]])[5:11])							
@@ -258,10 +259,10 @@ for(i in 1:dim(NDVIIDs)[1]){
 #save in 3 locations so undergrads can access for their own working folder
 #an original copy gets saved in the viper energy folder
 #I also have my own working folder
-dir1 <-c(#"c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\decagon\\csv_out\\",
-		#"c:\\Users\\hkropp\\Google Drive\\Loranty_Lab_Sensor\\decagon\\sensorData\\",
-		#"c:\\Users\\hkropp\\Google Drive\\viperSensor\\",
-		#"z:\\student_research\\tobio\\viperSensor\\decagon\\",
+dir1 <-c("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\decagon\\csv_out\\",
+		"c:\\Users\\hkropp\\Google Drive\\Loranty_Lab_Sensor\\decagon\\sensorData\\",
+		"c:\\Users\\hkropp\\Google Drive\\viperSensorOut\\",
+		"z:\\student_research\\tobio\\viperSensor\\decagon\\",
 		"z:\\data_repo\\field_data\\viperSensor\\decagon\\")
 for(k in 1:length(dir1)){
 for(i in 1:dim(NDVIIDs)[1]){
