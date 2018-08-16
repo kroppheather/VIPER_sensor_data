@@ -19,7 +19,7 @@ library(plyr)
 setwd("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\campbell\\csv_to_process")
 #setwd("c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\ls_toprocess")
 #specify an output path
-output.path<-"c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\campbell\\csv_out"
+output.path<-"z:\\data_repo\\field_data\\viperData\\sensor\\campbell"
 #indicate the date format of the data
 dateFormat<-"%m/%d/%Y %H:%M"
 
@@ -168,7 +168,8 @@ radiationF <- fileStart[fileStart$measType=="radiation",]
 dir1 <-c(#"c:\\Users\\hkropp\\Google Drive\\viper_energy\\combined_files\\campbell\\csv_out\\",
 		#"c:\\Users\\hkropp\\Google Drive\\Loranty_Lab_Sensor\\campbell\\",
 		#"c:\\Users\\hkropp\\Google Drive\\viperSensor\\",
-		"z:\\student_research\\tobio\\viperSensor\\campbell\\")
+		#"z:\\student_research\\tobio\\viperSensor\\campbell\\"
+		"z:\\data_repo\\field_data\\viperData\\sensor\\campbell")
 
 sapflowListTemp<-list()
 for(k in 1:length(dir1)){
